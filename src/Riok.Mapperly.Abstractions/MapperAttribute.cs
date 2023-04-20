@@ -39,7 +39,13 @@ public sealed class MapperAttribute : Attribute
     /// If set to <c>true</c> an <see cref="ArgumentNullException"/> is thrown.
     /// If set to <c>false</c> the property assignment is ignored.
     /// </summary>
+    [Obsolete($"Use {nameof(NullPropertyMappingStrategy)} instead")]
     public bool ThrowOnPropertyMappingNullMismatch { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public NullPropertyMappingStrategy NullPropertyMappingStrategy { get; set; } = NullPropertyMappingStrategy.SetOrIgnoreIfNull;
 
     /// <summary>
     /// Whether to always deep copy objects.
@@ -47,7 +53,8 @@ public sealed class MapperAttribute : Attribute
     /// with <c><see cref="UseDeepCloning"/>=true</c>, the same array is reused.
     /// With <c><see cref="UseDeepCloning"/>=false</c>, the array and each person is cloned.
     /// </summary>
-    public bool UseDeepCloning { get; set; }
+    public bool UseDeepCloning
+    { get; set; }
 
     /// <summary>
     /// Enabled conversions which Mapperly automatically implements.

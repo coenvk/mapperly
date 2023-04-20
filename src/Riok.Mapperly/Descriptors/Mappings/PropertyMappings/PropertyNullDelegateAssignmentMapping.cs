@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Riok.Mapperly.Abstractions;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static Riok.Mapperly.Emit.SyntaxFactoryHelper;
 
@@ -12,16 +13,16 @@ namespace Riok.Mapperly.Descriptors.Mappings.PropertyMappings;
 public class PropertyNullDelegateAssignmentMapping : PropertyAssignmentMappingContainer
 {
     private readonly PropertyPath _nullConditionalSourcePath;
-    private readonly bool _throwInsteadOfConditionalNullMapping;
+    private readonly NullPropertyMappingStrategy _nullPropertyMappingStrategy;
 
     public PropertyNullDelegateAssignmentMapping(
         PropertyPath nullConditionalSourcePath,
         IPropertyAssignmentMappingContainer parent,
-        bool throwInsteadOfConditionalNullMapping)
+        NullPropertyMappingStrategy nullPropertyMappingStrategy)
         : base(parent)
     {
         _nullConditionalSourcePath = nullConditionalSourcePath;
-        _throwInsteadOfConditionalNullMapping = throwInsteadOfConditionalNullMapping;
+        _nullPropertyMappingStrategy = nullPropertyMappingStrategy;
     }
 
     public override IEnumerable<StatementSyntax> Build(
@@ -32,11 +33,32 @@ public class PropertyNullDelegateAssignmentMapping : PropertyAssignmentMappingCo
         //   target.Value = Map(Source.Name);
         // else
         //   throw ...
-        var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, true, true, true);
-        var condition = IsNotNull(sourceNullConditionalAccess);
-        var elseClause = _throwInsteadOfConditionalNullMapping
-            ? ElseClause(Block(ExpressionStatement(ThrowArgumentNullException(sourceNullConditionalAccess))))
-            : null;
+        if (_nullPropertyMappingStrategy == NullPropertyMappingStrategy.SetOrIgnoreIfNull)
+        {
+            var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, true, true, true);
+            var condition = IsNotNull(sourceNullConditionalAccess);
+            ElseClauseSyntax? elseClause = null;
+        }
+        else if (_nullPropertyMappingStrategy == NullPropertyMappingStrategy.SetOrThrowIfNull)
+        {
+            var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, true, true, true);
+            var condition = IsNotNull(sourceNullConditionalAccess);
+            var elseClause = ElseClause(Block(ExpressionStatement(ThrowArgumentNullException(sourceNullConditionalAccess))));
+        }
+        else if (_nullPropertyMappingStrategy == NullPropertyMappingStrategy.SetOrDefaultIfNull)
+        {
+            var sourceNullConditionalAccess = _nullConditionalSourcePath.BuildAccess(ctx.Source, true, true, true);
+            var condition = IsNotNull(sourceNullConditionalAccess);
+            var elseClause = ElseClause(Block(ExpressionStatement(DefaultExpression())));
+        }
+        else if (_nullPropertyMappingStrategy == NullPropertyMappingStrategy.IgnoreIfNull)
+        {
+
+        }
+        else if (_nullPropertyMappingStrategy == NullPropertyMappingStrategy.DefaultIfNull)
+        {
+
+        }
 
         return new[]
         {

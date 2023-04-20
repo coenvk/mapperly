@@ -8,6 +8,7 @@ public record TestSourceBuilderOptions(
     bool UseReferenceHandling = false,
     bool ThrowOnMappingNullMismatch = true,
     bool ThrowOnPropertyMappingNullMismatch = false,
+    NullPropertyMappingStrategy NullPropertyMappingStrategy = NullPropertyMappingStrategy.SetOrIgnoreIfNull,
     PropertyNameMappingStrategy PropertyNameMappingStrategy = PropertyNameMappingStrategy.CaseSensitive,
     MappingConversionType EnabledConversions = MappingConversionType.All,
     EnumMappingStrategy EnumMappingStrategy = EnumMappingStrategy.ByValue)

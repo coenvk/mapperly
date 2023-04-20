@@ -78,6 +78,7 @@ public partial class Mapper
             Attribute(options.UseReferenceHandling),
             Attribute(options.ThrowOnMappingNullMismatch),
             Attribute(options.ThrowOnPropertyMappingNullMismatch),
+            Attribute(options.NullPropertyMappingStrategy),
             Attribute(options.EnabledConversions),
             Attribute(options.PropertyNameMappingStrategy),
             Attribute(options.EnumMappingStrategy),

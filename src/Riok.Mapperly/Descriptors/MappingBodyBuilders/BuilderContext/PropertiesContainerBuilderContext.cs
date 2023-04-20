@@ -75,10 +75,17 @@ public class PropertiesContainerBuilderContext<T> :
             }
         }
 
+        var nullPropertyMappingStrategy = BuilderContext.MapperConfiguration.NullPropertyMappingStrategy;
+
+        if (BuilderContext.MapperConfiguration.ThrowOnPropertyMappingNullMismatch)
+        {
+            nullPropertyMappingStrategy = Abstractions.NullPropertyMappingStrategy.SetOrThrowIfNull;
+        }
+
         mapping = new PropertyNullDelegateAssignmentMapping(
             nullConditionSourcePath,
             parentMapping,
-            BuilderContext.MapperConfiguration.ThrowOnPropertyMappingNullMismatch);
+            nullPropertyMappingStrategy);
         _nullDelegateMappings[nullConditionSourcePath] = mapping;
         parentMapping.AddPropertyMappingContainer(mapping);
         return mapping;
